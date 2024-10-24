@@ -15,6 +15,7 @@ boot.o: boot.S
 kernel8.img: boot.o $(OFILES)
 	$(ARMPATH)/$(ARMCC)-ld -nostdlib boot.o $(OFILES) -T link.ld -Map kernel8.map -o kernel8.elf
 	$(ARMPATH)/$(ARMCC)-objcopy -O binary kernel8.elf kernel8.img
+	$(ARMPATH)/$(ARMCC)-objdump -d kernel8.elf > kernel8.objdump # for debugging
 
 clean:
 	rm -rf kernel8.elf 
