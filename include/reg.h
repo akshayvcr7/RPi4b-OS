@@ -15,4 +15,7 @@ inline void mmio_write(const uint32_t reg, uint32_t val)
     *(volatile uint32_t *)(reg) = val;
 }
 
+//Supports only %d, %x, %u, %c, %s
+void kprintf(char *fmt, ...);
+
 #endif
