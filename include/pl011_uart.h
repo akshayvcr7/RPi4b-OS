@@ -1,7 +1,6 @@
 #ifndef UART_H
 #define UART_H
 
-#include <stdint.h>
 #include "reg.h"
 
 #define GPFSEL0 PERIPHERAL_BASE + 0x200000
