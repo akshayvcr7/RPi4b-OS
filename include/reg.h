@@ -1,6 +1,7 @@
 #ifndef REG_H
 #define REG_H
 #include <stdint.h>
+#include <stddef.h>
 
 #define PERIPHERAL_BASE 0xFE000000
 #define UART0_BASE 0xFE201000
@@ -17,5 +18,7 @@ inline void mmio_write(const uint32_t reg, uint32_t val)
 
 //Supports only %d, %x, %u, %c, %s
 void kprintf(char *fmt, ...);
+
+void* memset(void* ptr, int c, size_t size);
 
 #endif

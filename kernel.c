@@ -1,13 +1,14 @@
 #include "pl011_uart.h"
 #include "mbox.h"
+#include "heap.h"
 
 
 void kernel_main(uint32_t r0, uint32_t r1, uint32_t r2, uint32_t r3)
 {
     volatile uint32_t mbox[36];
     uart_init();
-    kprintf("piAV r0=0x%x r1= 0x%x, r2=0x%x, r3=0x%x\n", r0, r1, r2, r3);
-    uint32_t *addr = 0x00000100;
+    kprintf("Hello World!! piAVOS\n");
+    //uint32_t *addr = 0x00000100;
     //kprintf("Hello world piAV OS %x, %x, %x, %x, %x, %x, %x, %x, %x, %x\n", *(addr+0), *(addr+4), *(addr+8), *(addr+12), *(addr+16), *(addr+20), *(addr+24), *(addr+28), *(addr+32), *(addr+36));
 
     mbox[0] = 8*4;          // length of mailbox includes header, tag, buffer etc
@@ -26,6 +27,17 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t r2, uint32_t r3)
     } else {
         kprintf("Mail box error!\n");
     }
+
+    //kprintf("heap addr data before 0x%x 0x%x 0x%x\n", *p, *(p+1), *(p+2));
+    //heap
+    heap_init();
+    /*uint32_t* r = kmalloc(8192U);
+    kprintf("kmalloc ret addr 0x%x\n", r);
+
+    r = kmalloc(5000U);
+    kprintf("kmalloc ret addr 0x%x\n", r);*/
+
+    //kprintf("heap addr data 0x%x 0x%x 0x%x 0x%x 0x%x\n", *p, *(p+1), *(p+2), *(p+3), *(p+4));
 
     while (1);
 }
