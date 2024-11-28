@@ -1,6 +1,6 @@
 ARMCC = aarch64-none-elf
 ARMPATH = /home/av/arm-gnu-toolchain-13.3.rel1-x86_64-aarch64-none-elf/bin
-ARMCCFLAGS = -Wall -O2 -ffreestanding -Iinc -nostdlib -nostartfiles
+ARMCCFLAGS = -Wall -O2 -ffreestanding -Iinc -nostdlib -nostartfiles -mgeneral-regs-only
 CFILES = $(wildcard *.c)
 OFILES = $(CFILES:.c=.o)
 
@@ -18,5 +18,5 @@ kernel8.img: boot.o $(OFILES)
 	$(ARMPATH)/$(ARMCC)-objdump -d kernel8.elf > kernel8.objdump # for debugging
 
 clean:
-	rm -rf kernel8.elf 
+	rm -rf kernel8.elf
 	rm -rf *.o *.img *.map *.objdump

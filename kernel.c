@@ -38,6 +38,8 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t r2, uint32_t r3)
     kprintf("kmalloc ret addr 0x%x\n", r);*/
 
     //kprintf("heap addr data 0x%x 0x%x 0x%x 0x%x 0x%x\n", *p, *(p+1), *(p+2), *(p+3), *(p+4));
+    int el = get_el();
+    kprintf("Exception level: %d \r\n", el);
 
     while (1);
 }
