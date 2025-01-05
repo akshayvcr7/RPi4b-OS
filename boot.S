@@ -81,8 +81,9 @@ stack:
     // if return halt the master core too <which is not possible> and should never come here
 	b 	hang
 
-//debugging using qemu
-///home/av/qemu/bin/debug/native/qemu-system-aarch64 -M raspi4b -serial null -serial mon:stdio -kernel kernel8.img -nographic
-///home/av/qemu/bin/debug/native/qemu-system-aarch64 -s -S -M raspi4b -nographic -kernel kernel8.img --debugging
+// debugging using qemu
+// /home/av/qemu/bin/debug/native/qemu-system-aarch64 -M raspi4b -serial null -serial mon:stdio -kernel kernel8.img -nographic [El2]
+// /home/av/qemu/bin/debug/native/qemu-system-aarch64 -M raspi4b -serial mon:stdio -nographic -cpu cortex-a72 -device loader,file=./kernel8.img -d int [EL3]
+// /home/av/qemu/bin/debug/native/qemu-system-aarch64 -s -S -M raspi4b -nographic -kernel kernel8.img --debugging
 // gdb-multiarch ; target remote :1234
-//sudo ./raspbootcom /dev/ttyUSB0 /home/av/project/rpi4os_git_run/RPi4b-OS/kernel8.img
+// sudo ./raspbootcom /dev/ttyUSB0 /home/av/project/rpi4os_git_run/RPi4b-OS/kernel8.img
