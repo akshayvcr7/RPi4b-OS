@@ -1,6 +1,7 @@
 #include "pl011_uart.h"
 #include "mbox.h"
 #include "heap.h"
+#include "timer.h"
 
 
 void kernel_main(uint32_t r0, uint32_t r1, uint32_t r2, uint32_t r3)
@@ -29,8 +30,24 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t r2, uint32_t r3)
     }
 
     //kprintf("heap addr data before 0x%x 0x%x 0x%x\n", *p, *(p+1), *(p+2));
+
     //heap
     heap_init();
+
+    //timer & interrupt
+    int el = get_el();
+    kprintf("Exception level: %d \r\n", el);
+    timer_init();
+    enable_interrupt_controller();
+    enable_irq();
+
+    int d = get_daif();
+    kprintf("DAIF: %x \r\n", d);
+
+    //irq_barrier();
+    //kprintf("TIMER CLO = 0x%x", mmio_read(0xFE003004));
+    //uint32_t val = mmio_read(0xFE003004) + 200000;
+	//mmio_write(0xFE003010, val);
     /*uint32_t* r = kmalloc(8192U);
     kprintf("kmalloc ret addr 0x%x\n", r);
 
@@ -38,8 +55,14 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t r2, uint32_t r3)
     kprintf("kmalloc ret addr 0x%x\n", r);*/
 
     //kprintf("heap addr data 0x%x 0x%x 0x%x 0x%x 0x%x\n", *p, *(p+1), *(p+2), *(p+3), *(p+4));
-    int el = get_el();
-    kprintf("Exception level: %d \r\n", el);
+    //int a = 1/0;
+    //kprintf("0/0: %d \r\n", a);
+    //abt();
 
-    while (1);
+    do {
+        /*kprintf("**************\n");
+        kprintf("Timer curval =0x%x\n", mmio_read(0xFE003004));
+        kprintf("Timer CS =0x%x\n", mmio_read(0xFE003000));
+        kprintf("interrupt_controller_pending: %x\n", mmio_read(0xFE00B200));*/
+    }while(1);
 }

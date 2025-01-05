@@ -17,11 +17,16 @@ hang:
 	b 	hang
 
 master:
-	ldr	x0, =SCTLR_VALUE_MMU_DISABLED
+
+	/*ldr	x0, =SCTLR_VALUE_MMU_DISABLED
 	msr	sctlr_el1, x0
 
 	mov	x0, #0x80000000
 	msr	hcr_el2, x0
+
+	// set up exception handlers
+    ldr     x2, =vector_table
+    msr     vbar_el1, x2
 
 	mov	x0, #0x3c5
 	msr	spsr_el2, x0
@@ -32,7 +37,30 @@ master:
     mov x0, sp
     msr SP_EL1, x0
 
-    eret
+    eret*/
+
+	ldr	x0, =SCTLR_VALUE_MMU_DISABLED
+	msr	sctlr_el1, x0
+
+	mov	x0, #0x80000000
+	msr	hcr_el2, x0
+
+	ldr	x0, =SCR_VALUE
+	msr	scr_el3, x0
+
+	ldr x2, =vector_table // load VBAR_EL1 with virtual
+	msr	vbar_el1, x2
+
+	mov	x0, #0x3c5
+	msr	spsr_el3, x0
+
+	adr	x0, setup
+	msr	elr_el3, x0
+
+	mov x0, sp
+    msr SP_EL1, x0
+
+	eret
 
 
 setup:
@@ -53,12 +81,8 @@ stack:
     // if return halt the master core too <which is not possible> and should never come here
 	b 	hang
 
-get_el:
-	mrs x0, CurrentEL
-	lsr x0, x0, #2
-	ret
-
 //debugging using qemu
 ///home/av/qemu/bin/debug/native/qemu-system-aarch64 -M raspi4b -serial null -serial mon:stdio -kernel kernel8.img -nographic
 ///home/av/qemu/bin/debug/native/qemu-system-aarch64 -s -S -M raspi4b -nographic -kernel kernel8.img --debugging
 // gdb-multiarch ; target remote :1234
+//sudo ./raspbootcom /dev/ttyUSB0 /home/av/project/rpi4os_git_run/RPi4b-OS/kernel8.img
