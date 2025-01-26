@@ -2,7 +2,7 @@
 #include "mbox.h"
 #include "heap.h"
 #include "timer.h"
-
+#include "scheduler.h"
 
 void kernel_main(uint32_t r0, uint32_t r1, uint32_t r2, uint32_t r3)
 {
@@ -58,11 +58,24 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t r2, uint32_t r3)
     //int a = 1/0;
     //kprintf("0/0: %d \r\n", a);
     //abt();
+    kprintf("init_task priority = 0x%x\n", current->priority);
+    int res = fork_process((uintptr_t)&kernel_process, (uintptr_t)"t_111111");
+	if (res != 0) {
+		kprintf("kernel process_1 fork error");
+		return; //hang
+	}
+	res = fork_process((uintptr_t)&kernel_process, (uintptr_t)"t_222222");
+	if (res != 0) {
+		kprintf("kernel process_2 fork error");
+		return; //hang
+	}
 
-    do {
-        /*kprintf("**************\n");
-        kprintf("Timer curval =0x%x\n", mmio_read(0xFE003004));
+    while(1) {
+        kprintf("**************\n");
+        /*kprintf("Timer curval =0x%x\n", mmio_read(0xFE003004));
         kprintf("Timer CS =0x%x\n", mmio_read(0xFE003000));
         kprintf("interrupt_controller_pending: %x\n", mmio_read(0xFE00B200));*/
-    }while(1);
+        schedule();
+        kprintf("------------\n");
+    }
 }
