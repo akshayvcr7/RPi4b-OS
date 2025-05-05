@@ -51,7 +51,7 @@ master:
 	ldr x2, =vector_table // load VBAR_EL1 with virtual
 	msr	vbar_el1, x2
 
-	mov	x0, #0x3c5
+	mov	x0, #0x1c5
 	msr	spsr_el3, x0
 
 	adr	x0, setup

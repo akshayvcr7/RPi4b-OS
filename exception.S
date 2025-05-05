@@ -1,3 +1,5 @@
+#include "sysreg.h"
+
 .macro interrupt_entry type
 	mov	x0, #\type
 	mrs	x1, esr_el1
@@ -6,10 +8,7 @@
 	b	hang
 .endm
 
-//stack frame size
-#define S_FRAME_SIZE			256
-
-.macro kernel_entry
+.macro kernel_entry, el
 	sub 	sp, sp, #S_FRAME_SIZE
 	stp 	x0, x1, [sp, #16 * 0]
 	stp 	x2, x3, [sp, #16 * 1]
@@ -26,18 +25,31 @@
 	stp	x24, x25, [sp, #16 * 12]
 	stp	x26, x27, [sp, #16 * 13]
 	stp	x28, x29, [sp, #16 * 14]
+
+	.if	\el == 0
+	mrs	x21, sp_el0
+	.else
+	add	x21, sp, #S_FRAME_SIZE
+	.endif /* \el == 0 */
+
     mrs	x22, elr_el1
 	mrs	x23, spsr_el1
 	stp	x30, x22, [sp, #16 * 15]
 	str	x23, [sp, #16 * 16]
 .endm
 
-.macro kernel_exit
-    ldr	x23, [sp, #16 * 16]
-	ldp	x30, x22, [sp, #16 * 15]
+.macro	kernel_exit, el
+	ldp	x22, x23, [sp, #16 * 16]
+	ldp	x30, x21, [sp, #16 * 15]
+
+	.if	\el == 0
+	msr	sp_el0, x21
+	.endif /* \el == 0 */
 
 	msr	elr_el1, x22
 	msr	spsr_el1, x23
+
+
 	ldp	x0, x1, [sp, #16 * 0]
 	ldp	x2, x3, [sp, #16 * 1]
 	ldp	x4, x5, [sp, #16 * 2]
@@ -53,63 +65,62 @@
 	ldp	x24, x25, [sp, #16 * 12]
 	ldp	x26, x27, [sp, #16 * 13]
 	ldp	x28, x29, [sp, #16 * 14]
-	ldr	x30, [sp, #16 * 15]
 	add	sp, sp, #S_FRAME_SIZE
 	eret
-.endm
+	.endm
 
 .align 11
 .globl vector_table
 vector_table:
-	// synchronous_t
+	// EL1 synchronous_t
     .align  7
     interrupt_entry 0
-    // IRQ_t
+    // EL1 IRQ_t
     .align  7
     interrupt_entry 1
-    // FIQ_t
+    // EL1 FIQ_t
     .align  7
     interrupt_entry 2
-    // SError_t
+    // EL1 SError_t
     .align  7
     interrupt_entry 3
 
-	// synchronous_h
+	// EL1 synchronous_h
     .align  7
     interrupt_entry 4
-    // IRQ_h
+    // EL1 IRQ_h
     .align  7
     bl handle_el1_irq
-    // FIQ_h
+    // EL1 FIQ_h
     .align  7
     interrupt_entry 6
-    // SError_h
+    // EL1 SError_h
     .align  7
     interrupt_entry 7
 
-    // synchronous_t
+    //EL0 synchronous_t
     .align  7
-    interrupt_entry 8
-    // IRQ_t
+    bl handle_el0_sync
+    //EL0 IRQ_t
     .align  7
-    interrupt_entry 9
-    // FIQ_t
+    bl el0_irq
+    //EL0 FIQ_t
     .align  7
     interrupt_entry 10
-    // SError_t
+    //EL0 SError_t
     .align  7
     interrupt_entry 11
 
-    // synchronous_t
+    //EL0 synchronous_t
     .align  7
     interrupt_entry 12
-    // IRQ_t
+    //EL0 IRQ_t
     .align  7
     interrupt_entry 13
-    // FIQ_t
+    //EL0 FIQ_t
     .align  7
     interrupt_entry 14
-    // SError_t
+    //EL0 SError_t
     .align  7
     interrupt_entry 15
 
@@ -119,9 +130,9 @@ elx_irq:
     eret
 
 handle_el1_irq:
-	kernel_entry
+	kernel_entry 1
 	bl	handle_irq
-	kernel_exit
+	kernel_exit 1
 
 .globl enable_irq
 enable_irq:
@@ -133,8 +144,53 @@ disable_irq:
 	msr	daifset, #0xf
 	ret
 
+el0_irq:
+	kernel_entry 0
+	bl	handle_irq
+	kernel_exit 0
+
+handle_el0_sync:
+	kernel_entry 0
+	mrs	x25, esr_el1				// read the syndrome register
+	lsr	x24, x25, #ESR_ELx_EC_SHIFT		// exception class
+	cmp	x24, #ESR_ELx_EC_SVC64			// SVC in 64-bit state
+	b.eq	handle_el0_svc
+	b hang
+
+sc_nr	.req	x25					// number of system calls
+scno	.req	x26					// syscall number
+stbl	.req	x27					// syscall table pointer
+
+handle_el0_svc:
+	adr    stbl, sys_call_table      // load syscall table pointer
+    uxtw   scno, w8                  // syscall number in w8
+    mov    sc_nr, #__NR_syscalls
+    bl     enable_irq
+    cmp    scno, sc_nr               // check upper syscall limit
+    b.hs   ni_sys
+    ldr    x16, [stbl, scno, lsl #3] // address in the syscall table
+    blr    x16                       // call sys_* routine
+    b      ret_from_syscall
+ni_sys:
+	b hang
+ret_from_syscall:
+	bl	disable_irq
+	str	x0, [sp, #S_X0]		// returned x0
+	kernel_exit 0
+
+.globl ret_from_fork
+ret_from_fork:
+	bl	schedule_tail
+	cbz	x19, ret_to_user			// not a kernel thread
+	mov	x0, x20
+	blr	x19 		//should never return
+ret_to_user:
+	bl disable_irq
+	kernel_exit 0
+
 .globl hang
-hang: b hang
+hang:
+	b test_error
 
 .global abt
 abt:

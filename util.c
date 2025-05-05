@@ -10,3 +10,13 @@ void* memset(void* ptr, int c, size_t size)
     }
     return ptr;
 }
+
+void sys_write(char * buf){
+	kprintf(buf);
+}
+
+void sys_exit(){
+	exit_process();
+}
+
+void* const sys_call_table[] = {sys_write, sys_exit};

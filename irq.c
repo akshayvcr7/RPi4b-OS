@@ -39,3 +39,21 @@ void handle_irq(void)
 			kprintf("Unknown pending irq: %x\n", irq);
 	}
 }
+
+void test_exception(void)
+{
+	kprintf("SVC 0 test_exception \n");
+	return;
+}
+
+void test_el(int el)
+{
+    kprintf("SVC custom EL level=%d \r\n", el);
+	return;
+}
+
+void test_error(int el)
+{
+    kprintf("SVC hang error xception class 0x%x\n", el);
+	while(1);
+}

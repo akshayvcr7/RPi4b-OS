@@ -21,6 +21,6 @@ void kprintf(char *fmt, ...);
 
 void* memset(void* ptr, int c, size_t size);
 
-int fork_process(uintptr_t fn, uintptr_t arg);
+int fork_process(unsigned long clone_flags, uintptr_t fn, uintptr_t arg, unsigned long stack);
 
 #endif

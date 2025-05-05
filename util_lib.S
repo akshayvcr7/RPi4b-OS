@@ -41,14 +41,20 @@ cpu_switch_to:
 	mov	sp, x9
 	ret
 
-.globl ret_from_fork
-ret_from_fork:
-	bl	schedule_tail
-	mov	x0, x20
-	blr	x19 		//should never return
-
 .globl delay
 delay:
 	subs x0, x0, #1
 	bne delay
+	ret
+
+.globl call_sys_exit
+call_sys_exit:
+	mov w8, #1
+	svc #0
+	ret
+
+.globl call_sys_write
+call_sys_write:
+	mov w8, #0
+	svc #0
 	ret

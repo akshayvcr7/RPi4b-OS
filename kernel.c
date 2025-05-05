@@ -4,7 +4,7 @@
 #include "timer.h"
 #include "scheduler.h"
 
-void kernel_main(uint32_t r0, uint32_t r1, uint32_t r2, uint32_t r3)
+void kernel_main(uint32_t r0)
 {
     volatile uint32_t mbox[36];
     uart_init();
@@ -59,16 +59,16 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t r2, uint32_t r3)
     //kprintf("0/0: %d \r\n", a);
     //abt();
     kprintf("init_task priority = 0x%x\n", current->priority);
-    int res = fork_process((uintptr_t)&kernel_process, (uintptr_t)"t_111111");
+    int res = fork_process(PF_KTHREAD, (uintptr_t)&kernel_process, (uintptr_t)"t_111111", 0);
 	if (res != 0) {
 		kprintf("kernel process_1 fork error");
 		return; //hang
 	}
-	res = fork_process((uintptr_t)&kernel_process, (uintptr_t)"t_222222");
+	/*res = fork_process((uintptr_t)&kernel_process, (uintptr_t)"t_222222");
 	if (res != 0) {
 		kprintf("kernel process_2 fork error");
 		return; //hang
-	}
+	}*/
 
     while(1) {
         kprintf("**************\n");

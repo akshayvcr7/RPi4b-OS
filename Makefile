@@ -21,4 +21,4 @@ kernel8.img: $(S_OFILES) $(C_OFILES)
 
 clean:
 	rm -rf kernel8.elf
-	rm -rf *.o *.img *.map *.objdump
+	rm -rf *.o *.img *.map *.objdump *.d
