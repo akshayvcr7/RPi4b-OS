@@ -91,8 +91,8 @@
 #define MATTR_NORMAL_NC_INDEX      1
 #define MAIR_EL1_VAL               ((MATTR_NORMAL_NC << (8 * MATTR_NORMAL_NC_INDEX)) | MATTR_DEVICE_nGnRnE << (8 * MATTR_DEVICE_nGnRnE_INDEX))
 
-#define PAGES_MAP              6   
-#define PAGES_MAP_SIZE      (PAGES_MAP * PAGE_SIZE)
+#define PAGES_MAP              7   
+#define PAGES_MAP_SIZE         (PAGES_MAP * PAGE_SIZE)
 #define ENTRIES_PER_TABLE      512
 #define PGD_SHIFT              (PAGE_SHIFT + 3 * TABLE_SHIFT)
 #define PUD_SHIFT              (PAGE_SHIFT + 2 * TABLE_SHIFT)
