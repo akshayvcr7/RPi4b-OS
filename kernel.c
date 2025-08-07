@@ -44,6 +44,11 @@ void kernel_main(uint32_t r0)
     int d = get_daif();
     kprintf("DAIF: %x \r\n", d);
 
+#ifdef MMU_ENABLE
+    mmu_init();
+    uart_puts("Test Print from Virtually Mapped UART Device\n");
+#endif
+
     //irq_barrier();
     //kprintf("TIMER CLO = 0x%x", mmio_read(0xFE003004));
     //uint32_t val = mmio_read(0xFE003004) + 200000;

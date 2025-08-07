@@ -3,8 +3,13 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#define PERIPHERAL_BASE 0xFE000000
+
+#define DEVICE_START 0xFC000000
+#define DEVICE_BASE 0xFE000000
+#define PERIPHERAL_BASE DEVICE_BASE
 #define UART0_BASE 0xFE201000
+
+
 
 inline volatile uint32_t mmio_read(uint32_t reg)
 {

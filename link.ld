@@ -41,4 +41,6 @@ SECTIONS
     __bss_end = .;
     __bss_size = __bss_end - __bss_start;
     __end = .;
+    . = ALIGN(0x00001000);
+    pgd_map = .;
 }

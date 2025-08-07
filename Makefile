@@ -6,13 +6,19 @@ C_OFILES = $(CFILES:.c=.o)
 SFILES = $(wildcard *.S)
 S_OFILES = $(SFILES:.S=.o)
 
+ifeq ($(mmu),1)
+	CFLAGS = -DMMU_ENABLE
+else
+	CFLAGS =
+endif
+
 all: clean kernel8.img
 
 %.o: %.S
-	$(ARMPATH)/$(ARMCC)-gcc $(ARMCCFLAGS) -I ./include -ggdb3 -c $< -o $@
+	$(ARMPATH)/$(ARMCC)-gcc $(ARMCCFLAGS) $(CFLAGS) -I ./include -ggdb3 -c $< -o $@
 
 %.o: %.c
-	$(ARMPATH)/$(ARMCC)-gcc $(ARMCCFLAGS) -I ./include -ggdb3 -c $< -o $@
+	$(ARMPATH)/$(ARMCC)-gcc $(ARMCCFLAGS) $(CFLAGS) -I ./include -ggdb3 -c $< -o $@
 
 kernel8.img: $(S_OFILES) $(C_OFILES)
 	$(ARMPATH)/$(ARMCC)-ld -nostdlib $(S_OFILES) $(C_OFILES) -T link.ld -Map kernel8.map -o kernel8.elf
