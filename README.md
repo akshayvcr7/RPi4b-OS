@@ -9,3 +9,9 @@ make
 
 # Output (write sys_call from user process)
 ![git_rpi_user_mode](https://github.com/user-attachments/assets/2892ce58-c8e7-46fc-80af-187a974761e7)
+
+# Output (virtually mapped UART Device)
+```
+make mmu=1
+```
+<img width="729" height="586" alt="VM" src="https://github.com/user-attachments/assets/49177df4-e7b2-4d3c-ae4b-6fed9dc52d2c" />
